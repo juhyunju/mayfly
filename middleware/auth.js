@@ -122,7 +122,6 @@ const verifyToken = async (req, res, next) => {
           // 사용자의 역할에 따라 적절한 처리 수행
           if (decoded.role === 'users') {
               req.users = decoded;
-              console.log(req.user)
               next();
           } else if (decoded.role === 'hosts') {
               req.hosts = decoded;

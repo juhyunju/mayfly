@@ -9,6 +9,14 @@ const createApp = () => {
   app.use(express.json());
   app.use(routes);
   app.use(morgan('combined'));
+  app.use(express.urlencoded({    
+    limit:"500mb",
+    extended: false
+  }));
+  app.use(express.json({
+    limit : "500mb"
+  }))
+
   return app;
 };
 
