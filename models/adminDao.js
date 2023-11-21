@@ -54,7 +54,7 @@ const checkUserScheduleByUserId = async (userId) => {
         JOIN classes ON orders.class_id = classes.id
         INNER JOIN schedules ON classes.id = schedules.class_id
         WHERE users.id = ?
-        ND schedules.status = 1
+        AND schedules.status = 1
         GROUP BY schedules.id `;
     return await database.appDataSource.query(query, [userId]);
 };
