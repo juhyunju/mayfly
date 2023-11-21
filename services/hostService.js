@@ -51,9 +51,7 @@ const hostSignup = async (code) => {
         if (hostData.length === 0) {
             // 가입되지 않은 경우 회원가입
             await hostDao.hostSignup(name, email, changeFirstNumber);
-            // console.log("hostDataAdd :", hostDataAdd)
             const newHostData = await hostDao.checkHost(email);
-            // console.log("newHostData", newHostData);
             const tokenIssuance = newHostData[0].id;
             const jwtToken = await hostVerifyToken.hostCreateToken(tokenIssuance, name, email, changeFirstNumber);
             return jwtToken;

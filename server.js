@@ -31,7 +31,7 @@ const start = async () => {
         const messages = [];
 
         io.on('connection', (socket) => {
-            console.log('연결 성공!');
+            console.log('소켓 연결 성공!');
 
             // 클라이언트가 메시지를 전송할 때
             socket.on('message', (msg) => {
