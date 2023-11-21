@@ -2,7 +2,6 @@ const token = require('jsonwebtoken');
 const secretkey = process.env.TYPEORM_SECRETKEY
 const bcrypt = require('bcrypt');
 
-
 // 패스워드 암호화
 const makehash = async (password, saltRound) => {
     return await bcrypt.hash(password, saltRound);
@@ -26,7 +25,6 @@ const adminVerifyToken = async (req, res, next) => {
             const decoded = await adminTokenDecode(jwtToken, secretkey);
             if (decoded.role === 'admin') {
                 req.admin = decoded;
-                console.log("asv",decoded)
                 next();
             } else {
                 throw new Error('Invalid role');
@@ -52,7 +50,7 @@ const userVerifyToken = async (req, res, next) => {
     const jwtToken = req.headers.authorization;
 
     if (!jwtToken) {
-        res.status(403).json({ message: '권한이 없습니다' })
+        res.status(403).json({ message: '토큰이 없습니다' })
 
     } else {
         try {
@@ -84,9 +82,9 @@ const hostTokenDecode = async (jwtToken, secretkey) => {
 // hostVerify토큰 검증
 const hostVerifyToken = async (req, res, next) => {
     const jwtToken = req.headers.authorization;
-
+    
     if (!jwtToken) {
-        res.status(403).json({ message: "권한이 없습니다" })
+        res.status(400).json({ message: "토큰이 없습니다." })
 
     } else {
         try {
