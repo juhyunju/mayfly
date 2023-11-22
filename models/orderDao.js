@@ -6,7 +6,6 @@ const checkRemainMember = async (scheduleId, transaction) => {
   const result = await transaction.query(query, [scheduleId]);
   return result[0].remain_member;
 };
-
 //스케줄에 enrolled_member 추가
 const addEnrolledMember = async (scheduleId, quantity, transaction) => {
   try {
@@ -37,7 +36,6 @@ const getUserCredit = async (userId, transaction) => {
   const result = await transaction.query(query, [userId]);
   return result[0].credit;
 };
-
 //유저 크레딧 추가
 const addUserCredit = async (userId, credit) => {
   await appDataSource.query(`UPDATE users SET credit = credit +? WHERE id =?`, [
@@ -82,7 +80,13 @@ const subtractHostCredit = async (hostId, price) => {
     [price, hostId]
   );
 };
-
+//특정 결제 내역 체크
+const checkOrder = async (orderId, userId) => {
+  return await appDataSource.query(
+    `SELECT id FROM orders WHERE user_id =? AND id =?`,
+    [userId, orderId]
+  );
+};
 //결제 내역 생성
 const createOrder = async (
   userId,
@@ -106,7 +110,6 @@ const createOrder = async (
   await transaction.query(query2, [orderId, orderId]);
   return { orderId: orderId };
 };
-
 //전체 결제 내역 조회
 const getAllOrders = async (userId) => {
   return await appDataSource.query(
@@ -120,7 +123,6 @@ const getAllOrders = async (userId) => {
     [userId]
   );
 };
-
 //특정 결제 내역 조회
 const getOrder = async (orderId) => {
   return await appDataSource.query(
@@ -136,7 +138,6 @@ const getOrder = async (orderId) => {
     [orderId]
   );
 };
-
 //결제 내역 삭제
 const deleteOrder = async (orderId) => {
   await appDataSource.query(
@@ -144,7 +145,6 @@ const deleteOrder = async (orderId) => {
     [orderId]
   );
 };
-
 //hostId로 주문내역 조회(추후 스케줄 테이블 조인해서 수업 날짜 및 시간도 받아오기)
 const getOrderIdByHostId = async (orderId, hostId) => {
   return await appDataSource.query(
@@ -165,7 +165,6 @@ const getRefreshToken = async (userId) => {
   );
   return result[0].refresh_token;
 };
-
 //Access Token 업데이트
 const updateAccessToken = async (userId, accessToken) => {
   return await appDataSource.query(
@@ -173,7 +172,6 @@ const updateAccessToken = async (userId, accessToken) => {
     [accessToken, userId]
   );
 };
-
 //큐알코드 조회
 const getQrcode = async (orderId) => {
   const result = await appDataSource.query(
@@ -201,4 +199,5 @@ module.exports = {
   getRefreshToken,
   updateAccessToken,
   getQrcode,
+  checkOrder,
 };

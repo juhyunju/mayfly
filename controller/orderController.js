@@ -18,7 +18,7 @@ const makeOrder = async (req, res) => {
     ) {
       error.error(400, "KEY_ERROR");
     }
-    const insertId = await orderService.makeOrder(
+    const result = await orderService.makeOrder(
       userId,
       classId,
       hostId,
@@ -27,9 +27,12 @@ const makeOrder = async (req, res) => {
       price,
       email
     );
-    console.log(insertId);
+    const orderId = result.orderId;
+    //카카오톡 내게 메시지 보내기로 예약 내역 전송
+    await orderService.sendKakaoToMe(userId, orderId);
+
     // await orderService.sendKakaoToMe(userId, orderId);
-    return res.status(200).json({ message: "ORDER_COMPLETED", insertId });
+    return res.status(200).json({ message: "ORDER_COMPLETED" });
   } catch (err) {
     console.log(err);
     return res.status(err.statusCode || 500).json({ message: err.message });
@@ -39,7 +42,7 @@ const makeOrder = async (req, res) => {
 //전체 결제 내역 조회하기
 const getAllOrders = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.users.id;
     if (!userId) {
       error.error(400, "KEY_ERROR");
     }
@@ -55,12 +58,12 @@ const getAllOrders = async (req, res) => {
 //특정 결제 내역 조회하기
 const getOrder = async (req, res) => {
   try {
+    const userId = req.users.id;
     const orderId = req.params.orderId;
     if (!orderId) {
       error.error(400, "KEY_ERROR");
     }
-
-    const result = await orderService.getOrder(orderId);
+    const result = await orderService.getOrder(orderId, userId);
     return res.status(200).json({ message: "ORDER_LOADED", result });
   } catch (err) {
     console.log(err);
@@ -71,12 +74,12 @@ const getOrder = async (req, res) => {
 //결제 취소하기
 const cancelOrder = async (req, res) => {
   try {
+    const userId = req.users.id;
     const orderId = req.params.orderId;
     if (!orderId) {
       error.error(400, "KEY_ERROR");
     }
-
-    const result = await orderService.cancelOrder(orderId);
+    const result = await orderService.cancelOrder(orderId, userId);
     return res.status(200).json({ message: "ORDER_CANCELED", result });
   } catch (err) {
     console.log(err);
@@ -139,10 +142,8 @@ const sendKakaoToMe = async (req, res) => {
 };
 
 //호스트 정산
-
 const adjustHostCredit = async (req, res) => {
   try {
-    console.log("여기 옵니까", req);
     const hostId = req.hosts.id;
     const amount = req.body.amount;
     const result = await orderService.adjustHostCredit(hostId, amount);
