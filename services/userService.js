@@ -59,6 +59,10 @@ const userSignup = async (code) => {
             const jwtToken = await userVerifyToken.userCreateToken(tokenIssuance, name, email, changeFirstNumber);
             return jwtToken;
         };
+        console.log(userData[0].deleted_at)
+        if(userData[0].deleted_at !== null){
+            return error(400, '탈퇴한 회원입니다');
+        };
         // 이미 가입된 사용자인 경우 로그인 처리
         await userDao.updateToken(accessToken,refreshToken,email);
         const tokenIssuance = userData[0].id;
