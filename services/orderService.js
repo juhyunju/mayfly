@@ -16,7 +16,7 @@ const makeOrder = async (
   email
 ) => {
   try {
-    await appDataSource.transaction(async (transaction) => {
+    const result = await appDataSource.transaction(async (transaction) => {
       //예외)예약 인원이 수업 잔여 인원을 넘을 때
       const checkRemainMember = await orderDao.checkRemainMember(
         scheduleId,
@@ -31,7 +31,7 @@ const makeOrder = async (
         throw new Error("NOT_ENOUGH_CREDITS");
       }
       //결제 내역 생성
-      const insertId = await orderDao.createOrder(
+      const orderId = await orderDao.createOrder(
         userId,
         classId,
         scheduleId,
@@ -45,33 +45,48 @@ const makeOrder = async (
       await orderDao.subtractUserCredit(userId, price, transaction);
       //호스트 포인트 증가
       await orderDao.addHostCredit(hostId, price, transaction);
-      console.log(insertId);
-      return insertId;
+      return orderId;
     });
+    return result;
   } catch (err) {
-    console.error("에러발생", err.message);
+    console.error(err.message);
     throw err;
   }
 };
-
 //전체 결제 내역 조회
 const getAllOrders = async (userId) => {
   return await orderDao.getAllOrders(userId);
 };
 //특정 결제 내역 조회
-const getOrder = async (orderId) => {
-  return await orderDao.getOrder(orderId);
+const getOrder = async (orderId, userId) => {
+  try {
+    const checkOrder = await orderDao.checkOrder(orderId, userId);
+    if (checkOrder.length == 0) {
+      error.error(401, "UNAUTHORIZED_USER");
+    }
+    return await orderDao.getOrder(orderId);
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
 };
-
 //결제 취소
-const cancelOrder = async (orderId) => {
-  //결제 내역 삭제
-  await orderDao.deleteOrder(orderId);
-  //해당 schedule에 수강 인원 차감
-  await orderDao.subtractEnrolledMember(orderId);
+const cancelOrder = async (orderId, userId) => {
+  try {
+    const checkOrder = await orderDao.checkOrder(orderId, userId);
+    if (checkOrder.length == 0) {
+      error.error(401, "UNAUTHORIZED_USER");
+    }
+    //결제 내역 삭제
+    await orderDao.deleteOrder(orderId);
+    //해당 schedule에 수강 인원 차감
+    await orderDao.subtractEnrolledMember(orderId);
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
   //qr코드 삭제
 };
-
 //QR_CODE 조회 (호스트 전용)
 const getOrderByHost = async (orderId, hostId) => {
   //해당 구매 내역의 호스트인지 확인
@@ -82,12 +97,10 @@ const getOrderByHost = async (orderId, hostId) => {
   //결제 내역 조회
   return checkHostAuth;
 };
-
 //포인트 충전
 const chargeUserCredit = async (userId, credit) => {
   await orderDao.addUserCredit(userId, credit);
 };
-
 //카카오 페이 결제 인증
 const kakaoAuth = async (tid, pg_token) => {
   return await fetch("https://kapi.kakao.com/v1/payment/approve", {
@@ -105,12 +118,10 @@ const kakaoAuth = async (tid, pg_token) => {
     }),
   });
 };
-
 //카카오톡 내게 보내기
 const sendKakaoToMe = async (userId, orderId) => {
   try {
     const refreshToken = await orderDao.getRefreshToken(userId);
-    console.log(refreshToken);
     const response = await axios({
       method: "post",
       url: "https://kauth.kakao.com/oauth/token",
@@ -124,7 +135,6 @@ const sendKakaoToMe = async (userId, orderId) => {
       },
     });
     //머지 후 대체 예정
-
     const accessToken = response.data.access_token;
 
     await orderDao.updateAccessToken(userId, accessToken);
@@ -171,7 +181,6 @@ const sendKakaoToMe = async (userId, orderId) => {
         address_title: `${title}`,
       })
     );
-    console.log("여기여기여기야");
     const result = await axios.post(url, params, { headers });
 
     if (result.data.result_code === 0) {
