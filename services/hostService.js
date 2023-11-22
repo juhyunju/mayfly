@@ -56,8 +56,10 @@ const hostSignup = async (code) => {
             const jwtToken = await hostVerifyToken.hostCreateToken(tokenIssuance, name, email, changeFirstNumber);
             return jwtToken;
         }
-
         // 이미 가입된 사용자인 경우 로그인 처리
+        if(hostData[0].deleted_at !== null){
+           return error(400,'탈퇴한 회원입니다')
+        };
         const tokenIssuance = hostData[0].id;
         const jwtToken = await hostVerifyToken.hostCreateToken(tokenIssuance, name, email, hostData[0].phone_number);
         return jwtToken;
