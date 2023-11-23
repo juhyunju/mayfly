@@ -52,7 +52,8 @@ const deleteUserByInfo = async(req, res) => {
 const getUserByCredit = async(req, res) => {
     try{
         const userId = req.users.id;
-        const userCreditList = await userServices.getUserByCredit(userId);
+        const userEmail = req.users.email;
+        const userCreditList = await userServices.getUserByCredit(userId, userEmail);
         return res.status(200).json({userCreditList: userCreditList})
     }catch(err){
         return res.status(500).json({ message: "SERVER ERROR" });

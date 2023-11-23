@@ -11,9 +11,18 @@ const createChatRoom = async(req,res) =>{
     res.status(500).json({message: "no"})
   }
 }
+const getUserChatRoom = async(req,res) => {
+  const id = req.users.id
+  try{
+    const room = await chatRoomService.getUserChatRoom(id)
+    res.status(200).json({room})
+  }catch(err){
+    res.status(500).json({message: "nope"})
+  }
+}
+
 const getChatRoom = async(req,res) => {
   const id = req.hosts.id
-  console.log(id)
   try{
     const room = await chatRoomService.getChatRoom(id)
     res.status(200).json({room})
@@ -22,7 +31,16 @@ const getChatRoom = async(req,res) => {
     console.log(err)
   }
 }
+const getChat = async(req,res) => {
+  const id = req.params.id
+  try{
+    const room = await chatRoomService.getChat(id)
+    res.status(200).json({room})
+  }catch(err){
+    res.status(500).json({message: "nope"})
+  }
+}
 
 module.exports = {
-  createChatRoom,getChatRoom
+  createChatRoom,getUserChatRoom,getChatRoom,getChat
 }

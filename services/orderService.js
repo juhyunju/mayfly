@@ -45,7 +45,9 @@ const makeOrder = async (
       await orderDao.subtractUserCredit(userId, price, transaction);
       //호스트 포인트 증가
       await orderDao.addHostCredit(hostId, price, transaction);
+
       return orderId;
+
     });
     return result;
   } catch (err) {

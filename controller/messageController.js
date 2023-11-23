@@ -9,9 +9,7 @@ const createMessage = async (req, res) => {
       sender = req.users.name
     }else if(req.hosts){
       sender = req.hosts.name
-      console.log(sender)
     }
-    console.log('222222222222',content,chatId)
     // io.sockets.emit("message",{
     //   content: message.content,
     //   name: message.name
@@ -30,7 +28,6 @@ const getAllMessages = async (req, res) => {
   try {
       const messages = await messageService.getAllMessages(id);
       res.status(200).json({messages});
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
