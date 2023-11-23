@@ -25,7 +25,7 @@ const adminLogin = async (req, res) => {
         if (result === false) {
             return res.json({ message: "passwords_do_not_match" });
         }
-        return res.json({ accessToken: result, message: "login_success" });
+        return res.json({ accessToken: result, role: 'admin', message: "login_success" });
     } catch (err) {
         return res.json({ message: "login_fail" })
     };
