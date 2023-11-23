@@ -13,8 +13,14 @@ const getChatRoom = async(id) =>{
   return chatRoom
 }
 
+const getChat = async(id) => {
+  const chatRoom = await chatRoomDao.getChat(id)
+  return chatRoom
+}
+
 module.exports = {
   createChatRoom,
   getUserChatRoom,
-  getChatRoom
+  getChatRoom,
+  getChat
 }
