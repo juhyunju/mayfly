@@ -29,6 +29,17 @@ const subtractEnrolledMember = async (orderId) => {
   );
 };
 
+//orderId로 가격 가져오기
+const getAmountByOrder = async (orderId) => {
+  return await appDataSource.query(
+    `SELECT o.quantity, c.price, c.host_id
+  FROM orders o 
+  JOIN classes c ON o.class_id = c.id
+  WHERE o.id = ?`,
+    [orderId]
+  );
+};
+
 ////유저 크레딧 관련
 //유저 크레딧 확인
 const getUserCredit = async (userId, transaction) => {
@@ -43,6 +54,7 @@ const addUserCredit = async (userId, credit) => {
     userId,
   ]);
 };
+
 //유저 크레딧 차감
 const subtractUserCredit = async (userId, price, transaction) => {
   try {
@@ -200,4 +212,5 @@ module.exports = {
   updateAccessToken,
   getQrcode,
   checkOrder,
+  getAmountByOrder,
 };
