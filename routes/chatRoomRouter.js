@@ -4,7 +4,7 @@ const chatRoomController = require('../controller/chatRoomController')
 const auth = require('../middleware/auth')
 
 router.post('/',auth.userVerifyToken,chatRoomController.createChatRoom)
-router.get('/:id',auth.hostVerifyToken,chatRoomController.getUserChatRoom)
+router.get('/:id',auth.userVerifyToken,chatRoomController.getUserChatRoom)
 
 
 module.exports = router
