@@ -21,6 +21,17 @@ const getUserChatRoom = async(req,res) => {
   }
 }
 
+const getChatRoom = async(req,res) => {
+  const id = req.hosts.id
+  try{
+    const room = await chatRoomService.getChatRoom(id)
+    res.status(200).json({room})
+  }catch(err){
+    res.status(500).json({message:"nope"})
+    console.log(err)
+  }
+}
+
 module.exports = {
-  createChatRoom,getUserChatRoom
+  createChatRoom,getUserChatRoom,getChatRoom
 }
