@@ -139,10 +139,10 @@ const deleteUserByInfo = async (userId, userEmail) => {
     };
 };
 //유저 크레딧 조회
-const getUserByCredit = async (userId) => {
+const getUserByCredit = async (userId, userEmail) => {
     try {
         // 사용자 확인 및 크레딧 조회
-        const userCreditList = await userDao.checkUser(userId);
+        const userCreditList = await userDao.checkUser(userEmail);
         // 사용자가 존재하지 않는 경우 처리
         if (!userCreditList || userCreditList.length === 0) {
             error(400,'User does not exist');
