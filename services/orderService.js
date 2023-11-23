@@ -83,6 +83,16 @@ const cancelOrder = async (orderId, userId) => {
     await orderDao.deleteOrder(orderId);
     //해당 schedule에 수강 인원 차감
     await orderDao.subtractEnrolledMember(orderId);
+    //취소하는 orderId의 금액 가져오기
+    const data = await orderDao.getAmountByOrder(orderId);
+    const hostId = data[0].host_id;
+    const price = data[0].price;
+    const qunatity = data[0].quantity;
+    const totalPrice = price * qunatity;
+    //유저 크레딧 추가
+    await orderDao.addUserCredit(userId, totalPrice);
+    //호스트 크레딧 감소
+    await orderDao.subtractHostCredit(hostId, totalPrice);
   } catch (err) {
     console.error(err.message);
     throw err;
